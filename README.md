@@ -1,42 +1,54 @@
-# Frozenight
-
-NNUE chess engine written in Rust. [Play against it on lichess.org][lichess]
-
-The current minimum supported Rust version is 1.57.0.
+# Tantabus
+Tantabus is a WIP hobby Chess and Chess960 engine.<br>
+It is a "rewrite" of [Lunatic](https://github.com/analog-hors/lunatic).<br>
+The code is restructured and a bit cleaner, and it also uses my own [`cozy-chess`](https://github.com/analog-hors/cozy-chess) library in place of [`chess`](https://github.com/jordanbray/chess).<br>
+Play me on lichess: https://lichess.org/@/TantabusEngine.
 
 ## Features
-
-- [`cozy-chess`] for move generation
-- Fail-soft negamax alpha beta search framework
-- NNUE evaluation
-  - 768 -> 16x2 -> 1
-  - Training data generated through self-play, originally starting with a random network
-- Quiescense search
-  - MVV-LVA ordering
-  - Check Evasions
-  - Width limiting to prevent search explosion
-- Late move reductions
-- Null move pruning
-- Reverse futility pruning, except using qsearch instead of static eval
-- Transposition Table
-  - Always replace
+### Movegen
+- Fixed shift fancy black magic bitboards using [`cozy-chess`](https://github.com/analog-hors/cozy-chess)
+### Search
+- Principal variation search
+- Aspiration windows
+- Transposition table
+    - "Always replace" replacement scheme
+- Quiescence search
+- Extensions
+    - Check extensions
+- Reductions
+    - Late move reductions
+    - History reductions
+- Pruning
+    - Null move pruning
+    - Futility pruning
+    - Reverse futility pruning
+    - Late move pruning
+    - Negative SEE moves pruned in QSearch
 - Move ordering
-  - Hash move
-  - MVV-LVA captures
-  - Killer heuristic (ordered near pawn captures pawn)
-  - Relative history heuristic (almost)
-  - Underpromotions last
-- Time management
-  - Uses at least 2.5% and no more than 10% of remaining time, prefering to stop soon
+    - Hash move
+    - Capture moves
+        - Losing captures delayed to last
+    - Static exchange evaluation
+    - Killer moves
+    - History heuristic
+### Evaluation
+- [Automatically tuned with currently private tuner on the `lichess-big3-resolved` dataset](https://drive.google.com/file/d/1GfrNuDfD9Le-ZKKLxTHu0i3z6fbTn8JJ/view?usp=sharing)
+- King relative symmetric piece-square tables
+    - Dedicated passed pawn tables
+- Mobility evaluation (simple pseudo-legal counting)
+- Bishop pair bonus
+- Rook on open file bonus
+- Rook on semiopen file bonus
+- Basic king safety using "virtual queen mobility" and attacked squares around the king
+- Tapered/phased evaluation (using Fruit-like method)
+### Time management
+- Uses a fixed percentage of time left
 
 ## Thanks
-
-- Analog ([Tantabus]), for `cozy-chess` and helping me understand search techniques
-- Pali ([Black Marlin]), for helping me understand NN training and search techniques
-- Authors of the [chess programming wiki], for its wealth of knowledge
-
-[lichess]: https://lichess.org/@/FrozenightEngine
-[`cozy-chess`]: https://github.com/analog-hors/cozy-chess
-[Tantabus]: https://github.com/analog-hors/tantabus
-[Black Marlin]: https://github.com/dsekercioglu/blackmarlin
-[chess programming wiki]: https://www.chessprogramming.org/Main_Page
+Many engines have been very useful resources in the development of Tantabus.<br>
+A (potentially incomplete) list of citations is listed in the code, annotated with `// CITE` comments.<br>
+A (potentially incomplete) list of special thanks in no particular order:
+- [Pali (Black Marlin author)](https://github.com/dsekercioglu/blackmarlin), for assisting me with various things during the development of Tantabus on top of being like, cool and stuff.
+- [Jay (Berserk author)](https://github.com/jhonnold/berserk) for hosting the OpenBench instance that Tantabus develops on.
+- [Andrew (OpenBench and Ethereal author)](https://github.com/AndyGrant/Ethereal) for creating OpenBench. It has been an immensely helpful tool for engine development.
+- Other people I probably forgot about.
